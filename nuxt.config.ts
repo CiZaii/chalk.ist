@@ -56,6 +56,10 @@ export default defineNuxtConfig({
       globPatterns: [
         "**/*.{js,css,html,png,jpg,jpeg,svg,ico,json,txt,ttf,woff,woff2}",
       ],
+      enabled: process.env.NODE_ENV === 'production',
+      globDirectory: process.env.NODE_ENV === 'production' 
+        ? '.output/public' 
+        : '.nuxt/dev-sw-dist',
     },
 
     manifest: {

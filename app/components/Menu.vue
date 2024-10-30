@@ -42,6 +42,43 @@ function clearLineDecorations() {
     item.transformations = [];
   });
 }
+
+// 添加生成分享链接的函数
+const generateShareLink = async () => {
+  try {
+    const shareData = {
+      blocks: persistentState.value.blocks,
+    };
+    
+    // 直接使用 encodeURIComponent，不再使用 btoa
+    const encodedData = encodeURIComponent(JSON.stringify(shareData));
+    
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${baseUrl}?data=${encodedData}`;
+    
+    await navigator.clipboard.writeText(shareUrl);
+    alert('分享链接已复制到剪贴板！');
+  } catch (error) {
+    console.error('生成分享链接失败:', error);
+    alert('生成分享链接失败，请重试');
+  }
+};
+
+// 在组件挂载时检查 URL 参数并恢复状态
+onMounted(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedData = urlParams.get('data');
+  
+  if (sharedData) {
+    try {
+      // 直接使用 decodeURIComponent 解码
+      const decodedData = JSON.parse(decodeURIComponent(sharedData));
+      persistentState.value.blocks = decodedData.blocks;
+    } catch (error) {
+      console.error('恢复分享数据失败:', error);
+    }
+  }
+});
 </script>
 ©
 <template>
@@ -191,6 +228,10 @@ function clearLineDecorations() {
             <MenubarItem class="menubar-item" @click="copyPngToClipboard">
               <i-radix-icons:clipboard class="mr-2 size-4" />
               <span>Copy Image</span>
+            </MenubarItem>
+            <MenubarItem class="menubar-item" @click="generateShareLink">
+              <i-radix-icons:share-2 class="mr-2 size-4" />
+              <span>复制分享链接</span>
             </MenubarItem>
             <MenubarItem class="menubar-item" @click="downloadPNG">
               <i-radix-icons:download class="mr-2 size-4" />
