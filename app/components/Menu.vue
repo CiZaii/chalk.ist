@@ -50,14 +50,28 @@ const generateShareLink = async () => {
       blocks: persistentState.value.blocks,
     };
     
-    // 直接使用 encodeURIComponent，不再使用 btoa
     const encodedData = encodeURIComponent(JSON.stringify(shareData));
-    
     const baseUrl = window.location.origin + window.location.pathname;
-    const shareUrl = `${baseUrl}?data=${encodedData}`;
+    const longUrl = `${baseUrl}?data=${encodedData}`;
     
-    await navigator.clipboard.writeText(shareUrl);
-    alert('分享链接已复制到剪贴板！');
+    // 调用短链接 API
+    const response = await fetch('https://shortlink.zverify.cn/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+      },
+      body: JSON.stringify({
+        url: longUrl,
+        customSlug: ''
+      })
+    });
+    
+    const data = await response.json();
+    
+    // 复制短链接到剪贴板
+    await navigator.clipboard.writeText(data.link);
+    alert('短链接已复制到剪贴板！');
   } catch (error) {
     console.error('生成分享链接失败:', error);
     alert('生成分享链接失败，请重试');
