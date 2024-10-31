@@ -49,30 +49,15 @@ const generateShareLink = async () => {
     const shareData = {
       blocks: persistentState.value.blocks,
     };
+
+    // 直接使用 encodeURIComponent，不再使用 btoa
     const encodedData = encodeURIComponent(JSON.stringify(shareData));
 
     const baseUrl = window.location.origin + window.location.pathname;
-    const longUrl = `${baseUrl}?data=${encodedData}`;
-    
-    // 打印长链接
-    console.log('生成短链接之前的完整URL:', longUrl);
-    
-    // 使用本地代理接口
-    const response = await fetch('/api/shortlink', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: longUrl,
-        customSlug: ''
-      })
-    });
-    
-    const data = await response.json();
-    
-    await navigator.clipboard.writeText(data.link);
-    alert('短链接已复制到剪贴板！');
+    const shareUrl = `${baseUrl}?data=${encodedData}`;
+
+    await navigator.clipboard.writeText(shareUrl);
+    alert('分享链接已复制到剪贴板！');
   } catch (error) {
     console.error('生成分享链接失败:', error);
     alert('生成分享链接失败，请重试');
@@ -83,14 +68,12 @@ const generateShareLink = async () => {
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const sharedData = urlParams.get('data');
-  
+
   if (sharedData) {
     try {
-      // 只进行一次解码
+      // 直接使用 decodeURIComponent 解码
       const decodedData = JSON.parse(decodeURIComponent(sharedData));
-      if (decodedData.blocks) {
-        persistentState.value.blocks = decodedData.blocks;
-      }
+      persistentState.value.blocks = decodedData.blocks;
     } catch (error) {
       console.error('恢复分享数据失败:', error);
     }
