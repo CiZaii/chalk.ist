@@ -54,9 +54,25 @@ const generateShareLink = async () => {
     const baseUrl = window.location.origin + window.location.pathname;
     const longUrl = `${baseUrl}?data=${encodedData}`;
     
-    // 使用我们的代理接口
-    const response = await fetch('/api/shortlink', {
+    // 使用完整的请求头配置
+    const response = await fetch('https://shortlink.zverify.cn/api', {
       method: 'POST',
+      headers: {
+        'accept': '*/*',
+        'accept-language': 'zh-CN,zh;q=0.9',
+        'cache-control': 'no-cache',
+        'content-type': 'application/json',
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'sec-ch-ua': '"Not?A_Brand";v="99", "Chromium";v="130"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'cross-site',
+        'Referer': 'https://shortlink.zverify.cn/',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+      },
       body: JSON.stringify({
         url: longUrl,
         customSlug: ''
