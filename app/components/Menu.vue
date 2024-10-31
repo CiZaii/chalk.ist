@@ -50,6 +50,7 @@ const generateShareLink = async () => {
       blocks: persistentState.value.blocks,
     };
     
+    // 使用 JSON.stringify 和 encodeURIComponent 处理数据
     const encodedData = encodeURIComponent(JSON.stringify(shareData));
     const baseUrl = window.location.origin + window.location.pathname;
     const longUrl = `${baseUrl}?data=${encodedData}`;
@@ -83,9 +84,11 @@ onMounted(() => {
   
   if (sharedData) {
     try {
-      // 直接使用 decodeURIComponent 解码
+      // 解码并解析数据
       const decodedData = JSON.parse(decodeURIComponent(sharedData));
-      persistentState.value.blocks = decodedData.blocks;
+      if (decodedData.blocks) {
+        persistentState.value.blocks = decodedData.blocks;
+      }
     } catch (error) {
       console.error('恢复分享数据失败:', error);
     }
