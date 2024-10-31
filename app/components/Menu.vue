@@ -54,6 +54,9 @@ const generateShareLink = async () => {
     const baseUrl = window.location.origin + window.location.pathname;
     const longUrl = `${baseUrl}?data=${encodeURIComponent(JSON.stringify(shareData))}`;
     
+    // 打印长链接
+    console.log('生成短链接之前的完整URL:', longUrl);
+    
     // 使用本地代理接口
     const response = await fetch('/api/shortlink', {
       method: 'POST',
