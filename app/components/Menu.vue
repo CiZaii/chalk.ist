@@ -46,18 +46,42 @@ function clearLineDecorations() {
 // 添加生成分享链接的函数
 const generateShareLink = async () => {
   try {
+    // 1. 先获取当前的数据
     const shareData = {
       blocks: persistentState.value.blocks,
     };
-
-    // 直接使用 encodeURIComponent，不再使用 btoa
-    const encodedData = encodeURIComponent(JSON.stringify(shareData));
-
-    const baseUrl = window.location.origin + window.location.pathname;
-    const shareUrl = `${baseUrl}?data=${encodedData}`;
-
-    await navigator.clipboard.writeText(shareUrl);
-    alert('分享链接已复制到剪贴板！');
+    
+    // 2. 生成基础URL
+    const baseUrl = window.location.origin;
+    
+    // 3. 生成数据部分，确保正确编码
+    const jsonString = JSON.stringify(shareData);
+    const encodedData = encodeURIComponent(jsonString);
+    const longUrl = `${baseUrl}/?data=${encodedData}`;
+    
+    // 打印检查
+    console.log('原始数据:', shareData);
+    console.log('JSON字符串:', jsonString);
+    console.log('编码后的数据:', encodedData);
+    console.log('完整长链接:', longUrl);
+    
+    // 4. 生成短链接
+    const response = await fetch('/api/shortlink', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: longUrl,
+        customSlug: ''
+      })
+    });
+    
+    const data = await response.json();
+    console.log('生成的短链接:', data.link);
+    
+    await navigator.clipboard.writeText(data.link);
+    alert('短链接已复制到剪贴板！');
   } catch (error) {
     console.error('生成分享链接失败:', error);
     alert('生成分享链接失败，请重试');
@@ -68,12 +92,16 @@ const generateShareLink = async () => {
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const sharedData = urlParams.get('data');
-
+  
   if (sharedData) {
     try {
-      // 直接使用 decodeURIComponent 解码
+      console.log('收到的编码数据:', sharedData);
       const decodedData = JSON.parse(decodeURIComponent(sharedData));
-      persistentState.value.blocks = decodedData.blocks;
+      console.log('解码后的数据:', decodedData);
+      
+      if (decodedData.blocks) {
+        persistentState.value.blocks = decodedData.blocks;
+      }
     } catch (error) {
       console.error('恢复分享数据失败:', error);
     }
