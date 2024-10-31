@@ -49,10 +49,10 @@ const generateShareLink = async () => {
     const shareData = {
       blocks: persistentState.value.blocks,
     };
-    
-    // 只进行一次编码
+    const encodedData = encodeURIComponent(JSON.stringify(shareData));
+
     const baseUrl = window.location.origin + window.location.pathname;
-    const longUrl = `${baseUrl}?data=${encodeURIComponent(JSON.stringify(shareData))}`;
+    const longUrl = `${baseUrl}?data=${encodedData}`;
     
     // 打印长链接
     console.log('生成短链接之前的完整URL:', longUrl);
