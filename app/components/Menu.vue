@@ -46,26 +46,35 @@ function clearLineDecorations() {
 // 添加生成分享链接的函数
 const generateShareLink = async () => {
   try {
-    // 1. 先获取当前的数据
-    const shareData = {
-      blocks: persistentState.value.blocks,
+    // 深拷贝并清理数据
+    const cleanData = {
+      blocks: persistentState.value.blocks.map(block => {
+        // 创建块的副本
+        const cleanBlock = { ...block };
+        
+        // 清理内容中可能包含的链接
+        if (cleanBlock.content) {
+          cleanBlock.content = cleanBlock.content
+            .replace(/https?:\/\/[^\s\n]+/g, '') // 移除所有 URL
+            .replace(/\s+/g, ' ')  // 规范化空白字符
+            .trim();  // 移除首尾空白
+        }
+        
+        return cleanBlock;
+      })
     };
     
-    // 2. 生成基础URL
+    // 生成链接
     const baseUrl = window.location.origin;
-    
-    // 3. 生成数据部分，确保正确编码
-    const jsonString = JSON.stringify(shareData);
+    const jsonString = JSON.stringify(cleanData);
     const encodedData = encodeURIComponent(jsonString);
     const longUrl = `${baseUrl}/?data=${encodedData}`;
     
     // 打印检查
-    console.log('原始数据:', shareData);
-    console.log('JSON字符串:', jsonString);
-    console.log('编码后的数据:', encodedData);
+    console.log('清理后的数据:', cleanData);
     console.log('完整长链接:', longUrl);
     
-    // 4. 生成短链接
+    // 生成短链接
     const response = await fetch('/api/shortlink', {
       method: 'POST',
       headers: {
@@ -78,8 +87,6 @@ const generateShareLink = async () => {
     });
     
     const data = await response.json();
-    console.log('生成的短链接:', data.link);
-    
     await navigator.clipboard.writeText(data.link);
     alert('短链接已复制到剪贴板！');
   } catch (error) {
