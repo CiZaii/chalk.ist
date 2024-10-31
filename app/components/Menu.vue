@@ -50,10 +50,10 @@ const generateShareLink = async () => {
       blocks: persistentState.value.blocks,
     };
     
-    // 生成链接
+    // 生成链接 - 使用 Base64 编码来保留所有字符
     const baseUrl = window.location.origin;
     const jsonString = JSON.stringify(shareData);
-    const encodedData = encodeURIComponent(jsonString);
+    const encodedData = btoa(encodeURIComponent(jsonString));
     const longUrl = `${baseUrl}/?data=${encodedData}`;
     
     // 打印检查
@@ -88,25 +88,17 @@ onMounted(() => {
     const sharedData = urlParams.get('data');
     
     if (sharedData) {
-      console.log('收到的原始数据:', sharedData);
+      console.log('收到的编码数据:', sharedData);
       
-      // 尝试解码 URL 编码
-      const decodedUrl = decodeURIComponent(sharedData);
-      console.log('URL解码后的数据:', decodedUrl);
+      // 使用 Base64 解码
+      const decodedString = decodeURIComponent(atob(sharedData));
+      console.log('解码后的字符串:', decodedString);
       
-      // 尝试解析 JSON
-      try {
-        const parsedData = JSON.parse(decodedUrl);
-        console.log('JSON解析后的数据:', parsedData);
-        
-        if (parsedData && parsedData.blocks) {
-          persistentState.value.blocks = parsedData.blocks;
-        } else {
-          console.error('数据格式不正确:', parsedData);
-        }
-      } catch (jsonError) {
-        console.error('JSON解析失败:', jsonError);
-        console.error('尝试解析的字符串:', decodedUrl);
+      const parsedData = JSON.parse(decodedString);
+      console.log('解析后的数据:', parsedData);
+      
+      if (parsedData && parsedData.blocks) {
+        persistentState.value.blocks = parsedData.blocks;
       }
     }
   } catch (error) {
