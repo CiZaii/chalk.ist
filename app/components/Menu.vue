@@ -70,10 +70,7 @@ const generateShareLink = async () => {
     const encodedData = base64UrlEncode(encodeURIComponent(jsonString));
     const longUrl = `${baseUrl}/?data=${encodedData}`;
     
-    // 打印检查
-    console.log('原始数据:', shareData);
-    console.log('JSON字符串:', jsonString);
-    console.log('编码后的URL:', longUrl);
+
     
     // 生成短链接
     const response = await fetch('/api/shortlink', {
@@ -103,15 +100,12 @@ onMounted(() => {
     const sharedData = urlParams.get('data');
     
     if (sharedData) {
-      console.log('收到的编码数据:', sharedData);
-      
+
       // 使用安全的 Base64URL 解码
       const decodedString = decodeURIComponent(base64UrlDecode(sharedData));
-      console.log('解码后的字符串:', decodedString);
-      
+
       const parsedData = JSON.parse(decodedString);
-      console.log('解析后的数据:', parsedData);
-      
+
       if (parsedData && parsedData.blocks) {
         persistentState.value.blocks = parsedData.blocks;
       }
