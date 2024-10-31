@@ -43,6 +43,20 @@ function clearLineDecorations() {
   });
 }
 
+// Base64 URL 安全的编解码函数
+const base64UrlEncode = (str) => {
+  return btoa(str)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+};
+
+const base64UrlDecode = (str) => {
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (str.length % 4) str += '=';
+  return atob(str);
+};
+
 // 添加生成分享链接的函数
 const generateShareLink = async () => {
   try {
@@ -50,14 +64,15 @@ const generateShareLink = async () => {
       blocks: persistentState.value.blocks,
     };
     
-    // 生成链接 - 使用 Base64 编码来保留所有字符
+    // 生成链接 - 使用安全的 Base64URL 编码
     const baseUrl = window.location.origin;
     const jsonString = JSON.stringify(shareData);
-    const encodedData = btoa(encodeURIComponent(jsonString));
+    const encodedData = base64UrlEncode(encodeURIComponent(jsonString));
     const longUrl = `${baseUrl}/?data=${encodedData}`;
     
     // 打印检查
     console.log('原始数据:', shareData);
+    console.log('JSON字符串:', jsonString);
     console.log('编码后的URL:', longUrl);
     
     // 生成短链接
@@ -90,8 +105,8 @@ onMounted(() => {
     if (sharedData) {
       console.log('收到的编码数据:', sharedData);
       
-      // 使用 Base64 解码
-      const decodedString = decodeURIComponent(atob(sharedData));
+      // 使用安全的 Base64URL 解码
+      const decodedString = decodeURIComponent(base64UrlDecode(sharedData));
       console.log('解码后的字符串:', decodedString);
       
       const parsedData = JSON.parse(decodedString);
