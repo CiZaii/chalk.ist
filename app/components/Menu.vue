@@ -46,33 +46,19 @@ function clearLineDecorations() {
 // 添加生成分享链接的函数
 const generateShareLink = async () => {
   try {
-    // 深拷贝并清理数据
-    const cleanData = {
-      blocks: persistentState.value.blocks.map(block => {
-        // 创建块的副本
-        const cleanBlock = { ...block };
-        
-        // 清理内容中可能包含的链接
-        if (cleanBlock.content) {
-          cleanBlock.content = cleanBlock.content
-            .replace(/https?:\/\/[^\s\n]+/g, '') // 移除所有 URL
-            .replace(/\s+/g, ' ')  // 规范化空白字符
-            .trim();  // 移除首尾空白
-        }
-        
-        return cleanBlock;
-      })
+    const shareData = {
+      blocks: persistentState.value.blocks,
     };
     
     // 生成链接
     const baseUrl = window.location.origin;
-    const jsonString = JSON.stringify(cleanData);
+    const jsonString = JSON.stringify(shareData);
     const encodedData = encodeURIComponent(jsonString);
     const longUrl = `${baseUrl}/?data=${encodedData}`;
     
     // 打印检查
-    console.log('清理后的数据:', cleanData);
-    console.log('完整长链接:', longUrl);
+    console.log('原始数据:', shareData);
+    console.log('编码后的URL:', longUrl);
     
     // 生成短链接
     const response = await fetch('/api/shortlink', {
