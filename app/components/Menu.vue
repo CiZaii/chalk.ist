@@ -90,21 +90,34 @@ const generateShareLink = async () => {
 
 // 在组件挂载时检查 URL 参数并恢复状态
 onMounted(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const sharedData = urlParams.get('data');
-  
-  if (sharedData) {
-    try {
-      console.log('收到的编码数据:', sharedData);
-      const decodedData = JSON.parse(decodeURIComponent(sharedData));
-      console.log('解码后的数据:', decodedData);
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('data');
+    
+    if (sharedData) {
+      console.log('收到的原始数据:', sharedData);
       
-      if (decodedData.blocks) {
-        persistentState.value.blocks = decodedData.blocks;
+      // 尝试解码 URL 编码
+      const decodedUrl = decodeURIComponent(sharedData);
+      console.log('URL解码后的数据:', decodedUrl);
+      
+      // 尝试解析 JSON
+      try {
+        const parsedData = JSON.parse(decodedUrl);
+        console.log('JSON解析后的数据:', parsedData);
+        
+        if (parsedData && parsedData.blocks) {
+          persistentState.value.blocks = parsedData.blocks;
+        } else {
+          console.error('数据格式不正确:', parsedData);
+        }
+      } catch (jsonError) {
+        console.error('JSON解析失败:', jsonError);
+        console.error('尝试解析的字符串:', decodedUrl);
       }
-    } catch (error) {
-      console.error('恢复分享数据失败:', error);
     }
+  } catch (error) {
+    console.error('处理URL参数时发生错误:', error);
   }
 });
 </script>
