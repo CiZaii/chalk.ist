@@ -44,14 +44,14 @@ function clearLineDecorations() {
 }
 
 // Base64 URL 安全的编解码函数
-const base64UrlEncode = (str) => {
+const base64UrlEncode = (str: string) => {
   return btoa(str)
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 };
 
-const base64UrlDecode = (str) => {
+const base64UrlDecode = (str: string) => {
   str = str.replace(/-/g, '+').replace(/_/g, '/');
   while (str.length % 4) str += '=';
   return atob(str);
