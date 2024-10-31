@@ -50,10 +50,9 @@ const generateShareLink = async () => {
       blocks: persistentState.value.blocks,
     };
     
-    // 使用 JSON.stringify 和 encodeURIComponent 处理数据
-    const encodedData = encodeURIComponent(JSON.stringify(shareData));
+    // 只进行一次编码
     const baseUrl = window.location.origin + window.location.pathname;
-    const longUrl = `${baseUrl}?data=${encodedData}`;
+    const longUrl = `${baseUrl}?data=${encodeURIComponent(JSON.stringify(shareData))}`;
     
     // 使用本地代理接口
     const response = await fetch('/api/shortlink', {
@@ -84,7 +83,7 @@ onMounted(() => {
   
   if (sharedData) {
     try {
-      // 解码并解析数据
+      // 只进行一次解码
       const decodedData = JSON.parse(decodeURIComponent(sharedData));
       if (decodedData.blocks) {
         persistentState.value.blocks = decodedData.blocks;
