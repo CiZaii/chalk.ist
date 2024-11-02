@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   
   try {
-    const response = await fetch('https://shortlink.zverify.cn/api', {
+    const response = await fetch('https://shortlink.wl.do/api', {
       method: 'POST',
       headers: {
         'accept': '*/*',
